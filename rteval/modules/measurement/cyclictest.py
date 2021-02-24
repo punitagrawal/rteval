@@ -34,7 +34,7 @@ import math
 import libxml2
 from rteval.Log import Log
 from rteval.modules import rtevalModulePrototype
-from rteval.misc import expand_cpulist, online_cpus, cpuinfo
+from rteval.misc import expand_cpulist, online_cpus, cpuinfo, get_cpumodel
 
 class RunData:
     '''class to keep instance data from a cyclictest run'''
@@ -226,13 +226,15 @@ class Cyclictest(rtevalModulePrototype):
         for core in self.__cpus:
             self.__cyclicdata[core] = RunData(core, 'core', self.__priority,
                                               logfnc=self._log)
-            self.__cyclicdata[core].description = info[core]['model name']
+            self.__cyclicdata[core].description = get_cpumodel(info[core])
+            if self.__cyclicdata[core].description == 'unknown':
+                self._log(Log.INFO, "Unknown model for core %d" % core)
 
         # Create a RunData object for the overall system
         self.__cyclicdata['system'] = RunData('system',
                                               'system', self.__priority,
                                               logfnc=self._log)
-        self.__cyclicdata['system'].description = ("(%d cores) " % self.__numcores) + info['0']['model name']
+        self.__cyclicdata['system'].description = ("(%d cores) " % self.__numcores) + get_cpumodel(info['0'])
 
         if self.__sparse:
             self._log(Log.DEBUG, "system using %d cpu cores" % self.__numcores)

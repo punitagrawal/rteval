@@ -79,6 +79,27 @@ def cpuinfo():
         info[core][key] = val
     return info
 
+# Pass the per-core dictionary that is part of the dictionary returned
+# by cpuinfo()
+def get_cpumodel(core_info):
+    desc = core_info.get('model name', '')
+    if not desc:
+        # On Arm (both 32 and 64 bit), 'CPU Implementer' is always
+        # present. Return 'unknown' otherwise
+        if 'CPU implementer' not in core_info:
+            desc = 'unknown'
+        else:
+            implementor = core_info.get('CPU implementer', '')
+            architecture = core_info.get('CPU architecture', '')
+            variant = core_info.get('CPU variant', '')
+            part = core_info.get('CPU part', '')
+            revision = core_info.get('CPU revision', '')
+
+            desc = 'Implementor: %s Architecture: %s Variant: %s Part: %s Revision: %s' \
+                % (implementor, architecture, variant, part, revision)
+
+    return desc
+
 if __name__ == "__main__":
 
     info = cpuinfo()
@@ -86,4 +107,4 @@ if __name__ == "__main__":
     for i in idx:
         print("%s: %s" % (i, info[i]))
 
-    print("0: %s" % (info['0']['model name']))
+    print("0: %s" % (get_cpumodel(info['0'])))
