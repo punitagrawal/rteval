@@ -58,7 +58,7 @@ class KBuildJob:
         else:
             self.jobs = self.calc_jobs_per_cpu() * len(self.node)
         self.log(Log.DEBUG, "node %d: jobs == %d" % (int(node), self.jobs))
-        self.runcmd = "%s make O=%s -C %s -j%d bzImage modules" \
+        self.runcmd = "%s make O=%s -C %s -j%d" \
                 % (self.binder, self.objdir, self.kdir, self.jobs)
         self.cleancmd = "%s make O=%s -C %s clean allmodconfig" \
                 % (self.binder, self.objdir, self.kdir)
