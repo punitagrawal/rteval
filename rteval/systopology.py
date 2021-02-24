@@ -191,6 +191,31 @@ class NumaNode:
         """ return list of cpus for this node """
         return self.cpus.getcpulist()
 
+class FakeNumaNode(NumaNode):
+    """class representing a fake NUMA node. The fake NUMA node is used on
+    systems which don't have NUMA enabled (no
+    /sys/devices/system/node) such as Arm v7
+
+    """
+
+    cpupath = '/sys/devices/system/cpu'
+    mempath = '/proc/meminfo'
+
+    def __init__(self):
+        self.nodeid = 0
+        self.cpus = CpuList(sysread(FakeNumaNode.cpupath, "possible"))
+        self.getmeminfo()
+
+    def getmeminfo(self):
+        self.meminfo = {}
+        for l in open(FakeNumaNode.mempath, "r"):
+            elements = l.split()
+            key = elements[0][0:-1]
+            val = int(elements[1])
+            if len(elements) == 3 and elements[2] == "kB":
+                val *= 1024
+            self.meminfo[key] = val
+
 #
 # Class to abstract the system topology of numa nodes and cpus
 #
@@ -238,12 +263,13 @@ class SysTopology:
 
     def getinfo(self):
         nodes = glob.glob(os.path.join(SysTopology.nodepath, 'node[0-9]*'))
-        if not nodes:
-            raise RuntimeError("No valid nodes found in %s!" % SysTopology.nodepath)
-        nodes.sort()
-        for n in nodes:
-            node = int(os.path.basename(n)[4:])
-            self.nodes[node] = NumaNode(n)
+        if nodes:
+            nodes.sort()
+            for n in nodes:
+                node = int(os.path.basename(n)[4:])
+                self.nodes[node] = NumaNode(n)
+        else:
+            self.nodes[0] = FakeNumaNode()
 
     def getnodes(self):
         return list(self.nodes.keys())
