@@ -35,7 +35,7 @@ from rteval.Log import Log
 from rteval.misc import expand_cpulist, compress_cpulist
 from rteval.systopology import SysTopology
 
-kernel_prefix = "linux-5.7"
+kernel_prefix = "linux-5.13"
 
 class KBuildJob:
     '''Class to manage a build job bound to a particular node'''
@@ -302,7 +302,7 @@ class Kcompile(CommandLineLoad):
 
 def ModuleParameters():
     return {"source":   {"descr": "Source tar ball",
-                         "default": "linux-5.7.tar.xz",
+                         "default": "linux-5.13.2.tar.xz",
                          "metavar": "TARBALL"},
             "jobspercore": {"descr": "Number of working threads per core",
                             "default": 2,
