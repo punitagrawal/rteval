@@ -286,7 +286,6 @@ class Cyclictest(rtevalModulePrototype):
         if 'breaktrace' in self.__cfg and self.__cfg.breaktrace:
             self.__cmd.append("-b%d" % int(self.__cfg.breaktrace))
             self.__cmd.append("--tracemark")
-            self.__cmd.append("--notrace")
 
         # Buffer for cyclictest data written to stdout
         self.__cyclicoutput = tempfile.SpooledTemporaryFile(mode='w+b')
