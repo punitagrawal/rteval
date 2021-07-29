@@ -126,6 +126,8 @@ class rtevalCfgSection:
             return self.__cfgdata[key]
         return None
 
+    def __contains__(self, key):
+        return key in self.__cfgdata
 
     def items(self):
         return list(self.__cfgdata.items())
