@@ -44,7 +44,7 @@ class KernelInfo:
 
 
     def kernel_get_kthreads(self):
-        policies = {'FF':'fifo', 'RR':'rrobin', 'TS':'other', '?':'unknown'}
+        policies = {'DLN': 'deadline', 'FF':'fifo', 'RR':'rrobin', 'TS':'other', '?':'unknown'}
         ret_kthreads = {}
         self.__log(Log.DEBUG, "getting kthread status")
         cmd = '%s -eocommand,pid,policy,rtprio,comm' % getcmdpath('ps')
