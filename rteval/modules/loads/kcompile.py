@@ -51,8 +51,12 @@ class KBuildJob:
             os.mkdir(self.objdir)
         if os.path.exists('/usr/bin/numactl') and not cpulist:
             self.binder = 'numactl --cpunodebind %d' % int(self.node)
-        else:
+        elif cpulist is not None:
             self.binder = 'taskset -c %s' % compress_cpulist(cpulist)
+        else:
+            self.log(Log.WARN, 'Unable to set job affinity - please install "numactl" or pass "cpulist"')
+            self.log(Log.WARN, 'Running with default OS decided affinity')
+            self.binder = ''
         if cpulist:
             self.jobs = self.calc_jobs_per_cpu() * len(cpulist)
         else:
