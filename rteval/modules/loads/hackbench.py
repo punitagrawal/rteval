@@ -55,9 +55,8 @@ class Hackbench(CommandLineLoad):
         if ratio >= 0.75:
             mult = float(self._cfg.setdefault('jobspercore', 2))
         else:
-            self._log(Log.INFO, "Low memory system (%f GB/core)! Not running" % ratio)
+            self._log(Log.WARN, "Low memory system (%f GB/core)!" % ratio)
             mult = 0
-            self._donotrun = True
 
         sysTop = SysTopology()
         # get the number of nodes
