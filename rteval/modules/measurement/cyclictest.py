@@ -197,6 +197,7 @@ class Cyclictest(rtevalModulePrototype):
         self.__numanodes = int(self.__cfg.setdefault('numanodes', 0))
         self.__priority = int(self.__cfg.setdefault('priority', 95))
         self.__buckets = int(self.__cfg.setdefault('buckets', 2000))
+        self.__reportdir = self.__cfg.setdefault('reportdir', os.getcwd())
         self.__numcores = 0
         self.__cpus = []
         self.__cyclicdata = {}
@@ -255,6 +256,8 @@ class Cyclictest(rtevalModulePrototype):
         mounts.close()
         return ret
 
+    def _open_logfile(self, name):
+        return open(os.path.join(self.__reportdir, "logs", name), 'w+b')
 
     def _WorkloadSetup(self):
         self.__cyclicprocess = None
@@ -288,7 +291,7 @@ class Cyclictest(rtevalModulePrototype):
             self.__cmd.append("--tracemark")
 
         # Buffer for cyclictest data written to stdout
-        self.__cyclicoutput = tempfile.SpooledTemporaryFile(mode='w+b')
+        self.__cyclicoutput = self._open_logfile('cyclictest.stdout')
 
 
     def _WorkloadTask(self):
