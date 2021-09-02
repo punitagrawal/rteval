@@ -53,6 +53,7 @@ def online_cpus():
         for c in glob.glob('/sys/devices/system/cpu/cpu[0-9]*'):
             num = str(c.replace('/sys/devices/system/cpu/cpu', ''))
             online_cpus.append(num)
+    online_cpus.sort(key=int)
     return online_cpus
 
 def invert_cpulist(cpulist):
