@@ -67,20 +67,25 @@ class RunData:
         retval += "mean:       %f\n" % self.__mean
         return retval
 
-    def sample(self, value):
-        self.__samples[value] += self.__samples.setdefault(value, 0) + 1
+    def update_max(self, value):
         if value > self.__max:
             self.__max = value
+
+    def update_min(self, value):
         if value < self.__min:
             self.__min = value
+
+    def sample(self, value):
+        self.__samples[value] += self.__samples.setdefault(value, 0) + 1
+        self.update_max(value)
+        self.update_min(value)
         self.__numsamples += 1
 
     def bucket(self, index, value):
         self.__samples[index] = self.__samples.setdefault(index, 0) + value
-        if value and index > self.__max:
-            self.__max = index
-        if value and index < self.__min:
-            self.__min = index
+        if value:
+            self.update_max(index)
+            self.update_min(index)
         self.__numsamples += value
 
     def reduce(self):
@@ -328,6 +333,18 @@ class Cyclictest(rtevalModulePrototype):
         return False
 
 
+    def _parse_max_latencies(self, line):
+        if not line.startswith('# Max Latencies: '):
+            return
+
+        line = line.split(':')[1]
+        vals = [int(x) for x in line.split()]
+
+        for i, core in enumerate(self.__cpus):
+            self.__cyclicdata[core].update_max(vals[i])
+            self.__cyclicdata['system'].update_max(vals[i])
+
+
     def _WorkloadCleanup(self):
         if not self.__started:
             return
@@ -344,6 +361,8 @@ class Cyclictest(rtevalModulePrototype):
                 # Catch if cyclictest stopped due to a breaktrace
                 if line.startswith('# Break value: '):
                     self.__breaktraceval = int(line.split(':')[1])
+                elif line.startswith('# Max Latencies: '):
+                    self._parse_max_latencies(line)
                 continue
 
             # Skipping blank lines
