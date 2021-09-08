@@ -83,8 +83,8 @@ class SystemServices:
         self.__log(Log.DEBUG, "cmd: %s" % cmd)
         c = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         for p in c.stdout:
-            # p are lines like "servicename.service status"
-            v = p.strip().split()
+            # p are lines like b'servicename.service status'
+            v = p.decode().strip().split()
             ret_services[v[0].split('.')[0]] = v[1]
         return ret_services
 
@@ -92,7 +92,7 @@ class SystemServices:
     def services_get(self):
         cmd = [getcmdpath('ps'), '-ocomm=', '1']
         c = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        self.__init = c.stdout.read().strip()
+        self.__init = c.stdout.read().decode().strip()
         if self.__init == 'systemd':
             self.__log(Log.DEBUG, "Using systemd to get services status")
             return self.__get_services_systemd()
